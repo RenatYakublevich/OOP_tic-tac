@@ -35,6 +35,8 @@ class Game:
 
 		self.turn_right = random.randint(0,1)
 		self.situation = 0
+		self.win_condition_on_zero = [self.zero for line in range(self.score_for_win)]
+		self.win_condition_on_cross = [self.cross for line in range(self.score_for_win)]
 
 	def draw_map(self):
 		for line in self.map:
@@ -55,19 +57,19 @@ class Game:
 		# проверка на лайн горизантально
 		if last_turn == -1:
 			return False
-		if self.map[int(last_turn[0]) - 1][:] == [self.cross for line in range(self.score_for_win)] or self.map[int(last_turn[0]) - 1][:] == [self.zero for line in range(self.score_for_win)]:
+		if self.map[int(last_turn[0]) - 1][:] == self.win_condition_on_cross or self.map[int(last_turn[0]) - 1][:] == self.win_condition_on_zero :
 			return True
 		correct_map_order = []
 		# проверка на лайн вертикально
 		for row in range(self.score_for_win):
 			correct_map_order.append(self.map[row][int(last_turn[1]) - 1])
-		if correct_map_order == [self.cross for line in range(self.score_for_win)] or correct_map_order == [self.zero for line in range(self.score_for_win)]:
+		if correct_map_order == self.win_condition_on_cross or correct_map_order == self.win_condition_on_zero:
 			return True 
 		# проверка на лайн косыми
 		correct_map_order = []
 		for row in range(self.score_for_win - 1,-1,-1):
 			correct_map_order.append(self.map[row][row])
-		if correct_map_order == [self.cross for line in range(self.score_for_win)] or correct_map_order == [self.zero for line in range(self.score_for_win)]:
+		if correct_map_order == self.win_condition_on_cross or correct_map_order == self.win_condition_on_zero:
 			return True
 
 		correct_map_order = []
@@ -75,7 +77,7 @@ class Game:
 		for row in range(self.score_for_win):
 			correct_map_order.append(self.map[line][row])
 			line -= 1
-		if correct_map_order == [self.cross for line in range(self.score_for_win)] or correct_map_order == [self.zero for line in range(self.score_for_win)]:
+		if correct_map_order == self.win_condition_on_cross or correct_map_order == self.win_condition_on_zero:
 			return True
 
 		score = 0
