@@ -34,6 +34,7 @@ class Game:
 		self.score_for_win = len(self.map[0])
 
 		self.turn_right = random.randint(0,1)
+		self.situation = 0
 
 	def draw_map(self):
 		for line in self.map:
@@ -77,6 +78,15 @@ class Game:
 		if correct_map_order == [self.cross for line in range(self.score_for_win)] or correct_map_order == [self.zero for line in range(self.score_for_win)]:
 			return True
 
+		score = 0
+		for el in self.map:
+			for zel in el:
+				if zel == -1:
+					score += 1
+
+		if score == 0:
+			self.situation = 'Ничья'
+			return 'Ничья'
 
 		return False
 		
@@ -84,23 +94,31 @@ class Game:
 	def start_game_loop(self):
 		turn_pos = -1
 		while not self.game_over(turn_pos):
-			self.draw_map()
-			turn_right_notification = 'крестиков' if self.turn_right == 0 else 'ноликов'
-			print(f'Ход {turn_right_notification}')
-			turn_pos = input('Введите позицию(пример 3 3, 3 ряд 3 ячейка) : ').split(' ')
+			try:
+				self.draw_map()
+				turn_right_notification = 'крестиков' if self.turn_right == 0 else 'ноликов'
+				print(f'Ход {turn_right_notification}')
+				
+				turn_pos = input('Введите позицию(пример 3 3, 3 ряд 3 ячейка) : ').split(' ')
 
-			if self.turn(turn_pos, self.cross if self.turn_right == 0 else self.zero) == False:
-				print('Ячейка уже занята!')
-				self.start_game_loop()
+				if self.turn(turn_pos, self.cross if self.turn_right == 0 else self.zero) == False:
+					print('Ячейка уже занята!')
+					self.start_game_loop()
 
-			self.turn_right = 0 if self.turn_right == 1 else 1
-
+				self.turn_right = 0 if self.turn_right == 1 else 1
+			except IndexError:
+					print('Такой ячейки нет!')
+					self.start_game_loop()
 		self.draw_map()
-		print(f'Выиграла команда {turn_right_notification}')
-		for_upgrade = 'cross' if turn_right_notification == 'крестиков' else 'null'
-		self.add_counts_wins(for_upgrade)
-		time.sleep(2)
-		exit()
+		if self.situation == 'Ничья':
+			print('Ничья')
+			exit()
+		else:
+			print(f'Выиграла команда {turn_right_notification}')
+			for_upgrade = 'cross' if turn_right_notification == 'крестиков' else 'null'
+			self.add_counts_wins(for_upgrade)
+			time.sleep(2)
+			exit()
 
 	def add_counts_wins(self,aim_for_upgrade):
 		with open('score.txt') as file:
