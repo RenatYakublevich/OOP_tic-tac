@@ -19,8 +19,8 @@ class Manager:
 	def show_rating():
 		with open('score.txt') as file:
 			lines = [line.strip() for line in file]
-			counts_wins_cross = int(lines[0][20])
-			counts_wins_zero = int(lines[1][19])
+			counts_wins_cross = lines[0][20:].replace(' ','')
+			counts_wins_zero = lines[1][19:].replace(' ','')
 			print(f'Количество побед крестиков - {counts_wins_cross}')
 			print(f'Количество побед ноликов - {counts_wins_zero}')
 
