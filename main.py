@@ -8,6 +8,7 @@ class Manager:
 		if menu == '2':
 			self.show_rating()
 		else:
+
 			size_map = int(input('Введите размер карты : '))
 			game = Game(size_map)
 
@@ -46,26 +47,28 @@ class Game:
 					print(self.cross if row == self.cross else self.zero, end='')
 			print('')
 
-	def turn(self, position, turn_right):
+
+	def turn(self,position,turn_right):
 		if self.map[int(position[0]) - 1][int(position[1]) - 1] != -1:
 			return False 
 		self.map[int(position[0]) - 1][int(position[1]) - 1] = turn_right
 
-	def game_end(self, last_turn):
+	def game_over(self,last_turn):
 		# проверка на лайн горизантально
 		if last_turn == -1:
 			return False
-
-		correct_map_order = self.map[int(last_turn[0]) - 1][:]
-		if correct_map_order == self.win_condition_on_cross or correct_map_order == self.win_condition_on_zero :
+		if self.map[int(last_turn[0]) - 1][:] == self.win_condition_on_cross or self.map[int(last_turn[0]) - 1][:] == self.win_condition_on_zero :
 			return True
-
+		correct_map_order = []
 		# проверка на лайн вертикально
-		correct_map_order = [self.map[row][int(last_turn[1]) - 1] for row in range(self.score_for_win)]
+		for row in range(self.score_for_win):
+			correct_map_order.append(self.map[row][int(last_turn[1]) - 1])
 		if correct_map_order == self.win_condition_on_cross or correct_map_order == self.win_condition_on_zero:
 			return True 
 		# проверка на лайн косыми
-		correct_map_order = [self.map[row][row] for row in range(self.score_for_win - 1,-1,-1)]
+		correct_map_order = []
+		for row in range(self.score_for_win - 1,-1,-1):
+			correct_map_order.append(self.map[row][row])
 		if correct_map_order == self.win_condition_on_cross or correct_map_order == self.win_condition_on_zero:
 			return True
 
@@ -85,22 +88,22 @@ class Game:
 
 		if score == 0:
 			self.situation = 'Ничья'
-			return True
+			return 'Ничья'
 
 		return False
+		
 
 	def start_game_loop(self):
 		turn_pos = -1
-		turn_right_notification = 'крестиков' if self.turn_right == 0 else 'ноликов'
-
-		while not self.game_end(turn_pos):
+		while not self.game_over(turn_pos):
 			try:
 				self.draw_map()
+				turn_right_notification = 'крестиков' if self.turn_right == 0 else 'ноликов'
 				print(f'Ход {turn_right_notification}')
 				
 				turn_pos = input('Введите позицию(пример 3 3, 3 ряд 3 ячейка) : ').split(' ')
 
-				if not self.turn(turn_pos, self.cross if self.turn_right == 0 else self.zero):
+				if self.turn(turn_pos, self.cross if self.turn_right == 0 else self.zero) == False:
 					print('Ячейка уже занята!')
 					self.start_game_loop()
 
@@ -119,15 +122,15 @@ class Game:
 			time.sleep(2)
 			exit()
 
-	@staticmethod
-	def add_counts_wins(aim_for_upgrade):
+	def add_counts_wins(self,aim_for_upgrade):
 		with open('score.txt') as file:
 			lines = [line.strip() for line in file]
 			counts_wins_cross = int(lines[0][20])
 			counts_wins_null = int(lines[1][19])
+
+
 		with open('score.txt','w') as file:
 			file.write(f'counts wins cross = {counts_wins_cross + 1}\ncounts wins null = {counts_wins_null}') if aim_for_upgrade == 'cross' else file.write(f'counts wins cross = {counts_wins_cross}\ncounts wins null = {counts_wins_null + 1}')
-
 
 if __name__ == '__main__':
 	manager = Manager()
